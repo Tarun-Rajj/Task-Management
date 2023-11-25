@@ -1,4 +1,4 @@
-from config.db_config import Base
+from app.config.db_config import Base
 from sqlalchemy import Column, Integer, String
 
 
@@ -7,4 +7,3 @@ class Task(Base):
     id = Column(Integer, primary_key=True)
     title = Column(String(100), nullable=False)
     description = Column(String(255), nullable=False)
-   

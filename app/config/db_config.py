@@ -6,7 +6,7 @@ from sqlalchemy.ext.declarative import declarative_base
 
 
 DB_URL = os.getenv(
-    "DB_URL", "sqlite:///./sql_api.db?check_same_thread=False"
+    "SQLALCHEMY_DATABASE_URI", "sqlite:///./sql_api.db?check_same_thread=False"
 )
 
 engine = create_engine(DB_URL, pool_recycle=280, pool_pre_ping=True)
