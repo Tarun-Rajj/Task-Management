@@ -1,1 +1,2 @@
-from .add_task import add_task_bp
+from .task import task_bp
+from .auth import auth_bp
