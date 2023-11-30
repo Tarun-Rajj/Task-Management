@@ -25,17 +25,29 @@ def registered(username, password, email, role):
     finally:
         session.close()
             
+# app/services/auth.py
+
+
 def signin(username, password):
     session = SessionLocal()
     try:
         user = session.query(User).filter(User.username == username).first()
         if user and validate_password(password, user.password):
-            return {
-                'message': 'Login successful',
+            # Generate a JWT token with user information
+            token = generate_jwt_token(user.id, user.username, str(user.role))
+            print("ssssss",user.role, type(user.role))
+            # Return only serializable data in the response
+            user_data = {
                 'user_id': user.id,
                 'username': user.username,
                 'email': user.email,
-                'role': user.role
+                'role': str(user.role) 
+            }
+
+            return {
+                'message': 'Login successful',
+                'user': user_data,
+                'token':token # Include the generated token in the response
             }
         else:
             return {'error': 'Invalid username or password'}, 401
@@ -43,6 +55,7 @@ def signin(username, password):
         return {'error': f'Error logging in: {e}'}
     finally:
         session.close()
+
 
 def change(username, current_password, new_password):
     session = SessionLocal()
@@ -67,7 +80,7 @@ def change(username, current_password, new_password):
         session.close()
 
 
-def forgot(username):
+def send_forgot_pass_email(username):
     session = SessionLocal()
     try:
         user = session.query(User).filter(User.username == username).first()
@@ -86,5 +99,18 @@ def forgot(username):
         session.close()
    
 
+# app/services/auth.py
+def get_user_role(user_id):
+    session = SessionLocal()
+
+    try:
+        user = session.query(User).filter(User.id == user_id).first()
+        if user:
+            print(user)
+            return user.role
+        else:
+            return None
+    finally:
+        session.close()
 
 

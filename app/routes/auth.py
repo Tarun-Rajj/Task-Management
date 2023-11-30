@@ -16,6 +16,8 @@ def signup():
     result = registered(username, password, email, role)
     return jsonify(result),201
 
+
+
 @auth_bp.route('/login', methods=['POST'])
 def login():
     data = request.get_json()
@@ -44,5 +46,5 @@ def forgot_password():
     if 'username' not in data:
         return {'error': 'Username is required'}, 400  
     username = data['username']
-    result = forgot(username)
+    result = send_forgot_pass_email(username)
     return jsonify(result),201

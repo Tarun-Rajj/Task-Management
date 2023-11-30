@@ -1,5 +1,7 @@
 # app/services/admin.py
-from app.models import User, SessionLocal
+from app.models import User
+from app.config.db_config import SessionLocal
+
 
 def add_manager(username, password):
     session = SessionLocal()
@@ -13,7 +15,7 @@ def add_manager(username, password):
         return {'message': 'Manager added successfully'}, 201
     except Exception as e:
         session.rollback()
-        return {'error': f'Error adding manager: {e}'}, 500
+        return {'error': f'Error adding manager: {e}'}
     finally:
         session.close()
 
@@ -31,7 +33,9 @@ def add_employee(username, password):
         return {'message': 'Employee added successfully'}, 201
     except Exception as e:
         session.rollback()
-        return {'error': f'Error adding employee: {e}'}, 500
+        return {'error': f'Error adding employee: {e}'}
     finally:
         session.close()
+
+
 

@@ -48,3 +48,8 @@ def update_task(task_id):
     return jsonify(result),201
 
 
+# @task_bp.route('/')
+# def home():
+#     role = Role.admin.value
+#     print(jsonify(role=role))
+#     return jsonify(role=role)
