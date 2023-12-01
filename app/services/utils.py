@@ -29,15 +29,7 @@ def send_password_reset_email(email, reset_token):
         return {'error': f'Error sending password reset email: {e}'}, 500
     
 
-# app/utils/token_utils.py
-import jwt
-from flask import current_app
 
-# Certainly! Here's a simple implementation for the decode_token_and_get_user_id function:
-
-# python
-# Copy code
-# app/services/auth.py
 import jwt
 from flask import current_app
 
@@ -69,7 +61,7 @@ def generate_jwt_token(user_id, username, role):
     if SECRET_KEY is None:
         raise ValueError('SECRET_KEY not set in the environment variables')
     # Set the expiration time for the token (e.g., 1 hour)
-    expiration_time = datetime.utcnow() + timedelta(hours=1)
+    expiration_time = datetime.utcnow() + timedelta(days=1)
     # Create the token payload
     payload = {
         'user_id': user_id,

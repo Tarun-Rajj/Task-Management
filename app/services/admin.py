@@ -3,13 +3,13 @@ from app.models import User
 from app.config.db_config import SessionLocal
 
 
-def add_manager(username, password):
+def add_manager(data):
     session = SessionLocal()
     try:
-        existing_user = session.query(User).filter(User.username == username).first()
+        existing_user = session.query(User).filter(User.username == data['username']).first()
         if existing_user:
             return {'error': 'Username is already taken'}, 400
-        new_user = User(username=username, password=password, role='manager')
+        new_user = User(username=data['username'], password=data['password'], email= data['email'],role='manager')
         session.add(new_user)
         session.commit()
         return {'message': 'Manager added successfully'}, 201
@@ -21,13 +21,13 @@ def add_manager(username, password):
 
 
 
-def add_employee(username, password):
+def add_employee(data):
     session = SessionLocal()
     try:
-        existing_user = session.query(User).filter(User.username == username).first()
+        existing_user = session.query(User).filter(User.username == data['username']).first()
         if existing_user:
             return {'error': 'Username is already taken'}, 400
-        new_user = User(username=username, password=password, role='employee')
+        new_user = User(username=data['username'], password=data['password'], email= data['email'], role='employee')
         session.add(new_user)
         session.commit()
         return {'message': 'Employee added successfully'}, 201

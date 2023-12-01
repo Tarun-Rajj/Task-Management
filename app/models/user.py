@@ -1,5 +1,6 @@
 from .role import *
 from .task import *
+from sqlalchemy.orm import relationship
 
 class User(Base):
     __tablename__ = 'users'
@@ -8,3 +9,4 @@ class User(Base):
     password = Column(String(100), nullable=False)
     email = Column(String(254), unique=True, nullable=False)
     role = Column(Enum(Role), nullable=False)
+    tasks = relationship('Task', back_populates='user')
