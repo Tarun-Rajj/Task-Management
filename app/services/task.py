@@ -1,7 +1,7 @@
 from app.models import Task
 from app.config.db_config import SessionLocal
 
-def add_task(title,description):
+def add(title,description):
     session = SessionLocal()
     try:
         new_task = Task(title=title, description=description)
@@ -14,7 +14,7 @@ def add_task(title,description):
     finally:
         session.close()
 
-def view_task(task_id):
+def view(task_id):
     session = SessionLocal()
     try:
         task = session.query(Task).filter(Task.id == task_id).first()
@@ -31,7 +31,7 @@ def view_task(task_id):
     finally:
         session.close()
 
-def view_all_tasks():
+def viewall():
     session = SessionLocal()
     try:
         tasks = session.query(Task).all()
@@ -49,7 +49,7 @@ def view_all_tasks():
     finally:
         session.close()
 
-def delete_task(task_id):
+def delete(task_id):
     session = SessionLocal()
     try:
         task = session.query(Task).filter(Task.id == task_id).first()
@@ -67,7 +67,7 @@ def delete_task(task_id):
         session.close()
 
 
-def update_task(task_id, data):
+def update(task_id, data):
     session = SessionLocal()
     try:
         task = session.query(Task).filter(Task.id == task_id).first()
