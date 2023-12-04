@@ -1,6 +1,7 @@
 # app/services/admin.py
 from app.models import User
 from app.config.db_config import SessionLocal
+from app.services.utils import *
 
 
 def add_manager(data):
@@ -9,7 +10,8 @@ def add_manager(data):
         existing_user = session.query(User).filter(User.username == data['username']).first()
         if existing_user:
             return {'error': 'Username is already taken'}, 400
-        new_user = User(username=data['username'], password=data['password'], email= data['email'],role='manager')
+        hashed_password = bcrypt.hashpw(data['password'].encode('utf-8'), bcrypt.gensalt())
+        new_user = User(username=data['username'], password=hashed_password, email= data['email'], role='manager')
         session.add(new_user)
         session.commit()
         return {'message': 'Manager added successfully'}, 201
@@ -27,7 +29,8 @@ def add_employee(data):
         existing_user = session.query(User).filter(User.username == data['username']).first()
         if existing_user:
             return {'error': 'Username is already taken'}, 400
-        new_user = User(username=data['username'], password=data['password'], email= data['email'], role='employee')
+        hashed_password = bcrypt.hashpw(data['password'].encode('utf-8'), bcrypt.gensalt())
+        new_user = User(username=data['username'], password=hashed_password, email= data['email'], role='employee')
         session.add(new_user)
         session.commit()
         return {'message': 'Employee added successfully'}, 201

@@ -1,7 +1,8 @@
 import bcrypt
 from app.config import mail
 import uuid
-from flask_mail import Message  
+from flask_mail import Message 
+ 
 
 def hash_password(password):
     salt = bcrypt.gensalt()
@@ -29,6 +30,7 @@ def send_password_reset_email(email, reset_token):
         return {'error': f'Error sending password reset email: {e}'}, 500
     
 
+# app/utils/token_utils.py
 
 import jwt
 from flask import current_app
@@ -67,7 +69,6 @@ def generate_jwt_token(user_id, username, role):
         'user_id': user_id,
         'username': username,
         'role': role,
-        # 'sub' : username,
         'exp': expiration_time
     }
     token = jwt.encode(payload, os.getenv('SECRET_KEY') , algorithm='HS256')

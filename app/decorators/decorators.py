@@ -4,6 +4,7 @@ from functools import wraps
 from flask import request, jsonify
 from app.services.auth import get_user_role
 from app.services.utils import *
+import jwt
 
 def requires_role(required_role):
     def decorator(func):
@@ -50,10 +51,45 @@ def requires_role_manager():
                     return jsonify({'error': 'Permission denied. Admin or Manager role required.'}), 403
             except Exception as e:
                 return jsonify({'error': f'Error in role check: {e}'}), 500
-        
-
         return wrapper
     return decorator
+
+def token_required(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        auth_header = request.headers.get('Authorization')
+
+        if not auth_header:
+            return jsonify({'message': 'Token is missing!'}), 401
+        parts = auth_header.split()
+
+        if parts[0].lower() != 'bearer':
+            return jsonify({'message': 'Authorization header must start with Bearer'}), 401
+        elif len(parts) == 1:
+            return jsonify({'message': 'Token not found'}), 401
+        elif len(parts) > 2:
+            return jsonify({'message': 'Authorization header must be Bearer + \s + token'}), 401
+
+        token = parts[1]
+
+        try:
+            data = jwt.decode(token, current_app.config['SECRET_KEY'], algorithms=['HS256'])
+            current_user = data['username']
+            
+
+        except jwt.ExpiredSignatureError:
+            return jsonify({'message': 'Token has expired!'}), 401
+        except jwt.InvalidTokenError as e:
+            print(f"Invalid Token: {e}")
+            return jsonify({'message': 'Invalid token!'}), 401
+        return f(current_user, *args, **kwargs)
+
+    return decorated_function
+
+
+
+
+
 
 
 

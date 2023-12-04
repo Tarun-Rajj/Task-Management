@@ -25,13 +25,13 @@ def upgrade() -> None:
 
     role_enum = sa.Enum('admin', 'manager', 'employee', name='role_enum')
     role_enum.create(op.get_bind(), checkfirst=False)
-    op.add_column('users', sa.Column('role', role_enum, nullable=False))
+    # op.add_column('users', sa.Column('role', role_enum, nullable=False))
    
   
 
 
 def downgrade() -> None:
-    op.drop_column('users', 'role')
+    op.drop_column('users')
 
     role_enum = sa.Enum('admin', 'manager', 'employee', name='role_enum')
     role_enum.drop(op.get_bind(), checkfirst=False)
