@@ -1,1 +1,2 @@
-from .decorators import requires_role
+from .decorators import *
+from .decorators import requires_role_manager

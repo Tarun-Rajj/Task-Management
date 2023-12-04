@@ -14,6 +14,7 @@ def create_app():
     from app.routes.task import task_bp
     from app.routes.auth import auth_bp
     from app.routes.admin import admin_bp
+    from app.routes.manager import manager_bp
     app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv("SQLALCHEMY_DATABASE_URI")
     app.config['SECRET_KEY'] = os.getenv("SECRET_KEY")
     app.config.from_object('app.config.config')
@@ -22,6 +23,7 @@ def create_app():
     app.register_blueprint(task_bp)
     app.register_blueprint(auth_bp)
     app.register_blueprint(admin_bp)
+    app.register_blueprint(manager_bp)
     return app 
 
 create_app()
