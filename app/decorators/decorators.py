@@ -16,8 +16,8 @@ def requires_role(required_role):
                     return jsonify({'error': 'Authorization header missing'}), 401
 
                 token = authorization_header.split()[1]
-                user_id = decode_token_and_get_user_id(token)
-                user_role = get_user_role(user_id)
+                id = decode_token_and_get_user_id(token)
+                user_role = get_user_role(id)
                 print(user_role)
                 print(required_role)
                 if str(user_role) == required_role:
@@ -39,9 +39,10 @@ def requires_role_manager():
                 if not authorization_header:
                     return jsonify({'error': 'Authorization header missing'}), 401
                 token = authorization_header.split()[1]
-                user_id = decode_token_and_get_user_id(token)
+                id = decode_token_and_get_user_id(token)
+                print(id)
 
-                user_role = get_user_role(user_id)
+                user_role = get_user_role(id)
                 print(f"user role is:",user_role)
 
                 if str(user_role) in ['admin', 'manager']:
@@ -57,15 +58,14 @@ def requires_role_manager():
 def token_required(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
-        auth_header = request.headers.get('Authorization')
+        auth_header = request.headers.get('Authorization', '')
 
-        if not auth_header:
-            return jsonify({'message': 'Token is missing!'}), 401
+        if not auth_header or not auth_header.lower().startswith('bearer '):
+            return jsonify({'message': 'Authorization header must start with Bearer'}), 401
+
         parts = auth_header.split()
 
-        if parts[0].lower() != 'bearer':
-            return jsonify({'message': 'Authorization header must start with Bearer'}), 401
-        elif len(parts) == 1:
+        if len(parts) == 1:
             return jsonify({'message': 'Token not found'}), 401
         elif len(parts) > 2:
             return jsonify({'message': 'Authorization header must be Bearer + \s + token'}), 401
@@ -74,15 +74,16 @@ def token_required(f):
 
         try:
             data = jwt.decode(token, current_app.config['SECRET_KEY'], algorithms=['HS256'])
-            current_user = data['username']
-            
+            current_user_id = data['id']
+            current_user_role = data['role']
+            print("currentuser",current_user_id, current_user_role)
 
         except jwt.ExpiredSignatureError:
             return jsonify({'message': 'Token has expired!'}), 401
         except jwt.InvalidTokenError as e:
             print(f"Invalid Token: {e}")
             return jsonify({'message': 'Invalid token!'}), 401
-        return f(current_user, *args, **kwargs)
+        return f(current_user_id, current_user_role, *args, **kwargs)
 
     return decorated_function
 
