@@ -1,10 +1,10 @@
 from app.models import Task
 from app.config.db_config import SessionLocal
 
-def add(title,description):
+def add(data):
     session = SessionLocal()
     try:
-        new_task = Task(title=title, description=description)
+        new_task = Task(title=data['title'], description=data['description'],user_id=data['user_id'])
         session.add(new_task)
         session.commit()
         return {'message': 'Task added successfully'}, 201

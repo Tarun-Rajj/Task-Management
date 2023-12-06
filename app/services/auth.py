@@ -15,6 +15,7 @@ def registered(username, password, email, role):
         if role not in allowed_roles:
             return {'error': f'Invalid role. Allowed roles are: {", ".join(allowed_roles)}'}, 400
         hashed_password = hash_password(password)
+        print(f'hashp:',hashed_password)
         new_user = User(username=username, password=hashed_password, email=email, role=Role[role.lower()])
         session.add(new_user)
         session.commit()
@@ -35,8 +36,7 @@ def signin(username, password):
         if user and validate_password(password, user.password):
             # Generate a JWT token with user information
             token = generate_jwt_token(user.id, user.username, str(user.role))
-            print("ssssss",user.role, type(user.role))
-            # Return only serializable data in the response
+            # print("ssssss",user.role, type(user.role))
             user_data = {
                 'user_id': user.id,
                 'username': user.username,
@@ -47,7 +47,7 @@ def signin(username, password):
             return {
                 'message': 'Login successful',
                 'user': user_data,
-                'token':token # Include the generated token in the response
+                'token':token 
             }
         else:
             return {'error': 'Invalid username or password'}, 401

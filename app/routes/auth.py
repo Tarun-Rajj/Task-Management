@@ -1,5 +1,6 @@
 from flask import Blueprint, request, jsonify
 from app.services import *
+from app.decorators import *
 # from app.config import MAIL_SERVER
 
 auth_bp=Blueprint('auth',__name__)
@@ -30,6 +31,7 @@ def login():
 
 
 @auth_bp.route('/reset', methods=['POST'])
+@token_required
 def reset():
     data = request.get_json()
     if 'username' not in data or 'current_password' not in data or 'new_password' not in data:
@@ -41,6 +43,7 @@ def reset():
     return jsonify(result),201 
 
 @auth_bp.route('/forgot-password', methods=['POST'])
+@token_required
 def forgot_password():
     data = request.get_json()
     if 'username' not in data:
