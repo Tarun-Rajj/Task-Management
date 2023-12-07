@@ -1,6 +1,6 @@
 from flask import Blueprint, request, jsonify
 from app.services.admin import *
-from app.decorators import requires_role
+from app.decorators.permissions import requires_role
 admin_bp = Blueprint('admin', __name__)
 
 

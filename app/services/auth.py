@@ -4,7 +4,6 @@ from bcrypt import hashpw, gensalt, checkpw
 from .utils import *
 
 
-
 def registered(username, password, email, role):
     session = SessionLocal()
     try:
@@ -25,10 +24,8 @@ def registered(username, password, email, role):
     finally:
         session.close()
             
-# app/services/auth.py
 
-
-def signin(username, password):
+def signin(username, password, email):
     session = SessionLocal()
     try:
         user = session.query(User).filter(User.username == username).first()
@@ -77,10 +74,10 @@ def change(username, current_password, new_password):
         session.close()
 
 
-def send_forgot_pass_email(username):
+def send_forgot_pass_email(email):
     session = SessionLocal()
     try:
-        user = session.query(User).filter(User.username == username).first()
+        user = session.query(User).filter(User.email == email).first()
         if user:
             reset_token = generate_reset_token()
             user.reset_token = reset_token
@@ -95,8 +92,6 @@ def send_forgot_pass_email(username):
     finally:
         session.close()
    
-
-# app/services/auth.py
 def get_user_role(id):
     session = SessionLocal()
 
@@ -109,5 +104,3 @@ def get_user_role(id):
             return None
     finally:
         session.close()
-
-

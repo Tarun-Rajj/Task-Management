@@ -1,18 +1,17 @@
 from flask import Blueprint, request, jsonify
 from app.services import *
-from app.decorators import *
-from app.models import User
+# from app.decorators import *
+from app.decorators.permissions import *
+from app.models import *
 from app.config.db_config import *
 
 task_bp = Blueprint('add_task', __name__)
-
-
 
 @task_bp.route('/', methods=['POST'])
 
 @token_required
 @requires_role_manager()
-def add_task(current_user_id):
+def add_task(current_user_id,result):
     data=request.get_json()
     if not data.get('title') or not data.get('description'):
         return jsonify({'error': 'Title and description cannot be empty'}), 400
@@ -81,18 +80,22 @@ def view_all_tasks(tasks,a):
 
 @task_bp.route('/<int:task_id>', methods=['DELETE'])
 @token_required
-def delete_task(result,a,task_id):
+def delete_task(current_user_id, current_user_role, task_id):
+    if current_user_role == 'employee':
+        return jsonify({'error': 'You are not authorized to delete the task'}), 403
     result = delete(task_id)
-    if not result:
-        return jsonify({'error': 'No Task Found'}), 404
-    return jsonify(result),201
+    return jsonify(result), 201
 
 
 @task_bp.route('/<int:task_id>', methods=['PUT'])
 @token_required
-def update_task(result,a,task_id):
+def update_task(current_user_role,a,task_id):
+    if not task_id:
+        return jsonify({'error': 'Task not found'})
     data = request.get_json()
     if not data:
         return jsonify({'error': 'No data provided for update'}), 400
+    if current_user_role == 'employee':
+        return jsonify({'error':'U r ! @uthorized to update task'}), 403
     result = update(task_id, data)
     return jsonify(result),201
