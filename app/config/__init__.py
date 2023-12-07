@@ -1,4 +1,1 @@
-from flask_mail import Mail
-
-mail = Mail()
-from .config import *
+from app.config.db_config import *
