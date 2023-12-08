@@ -4,7 +4,6 @@ from bcrypt import hashpw, gensalt, checkpw
 from .utils import *
 
 
-
 def registered(username, password, email, role):
     session = SessionLocal()
     try:
@@ -15,7 +14,6 @@ def registered(username, password, email, role):
         if role not in allowed_roles:
             return {'error': f'Invalid role. Allowed roles are: {", ".join(allowed_roles)}'}, 400
         hashed_password = hash_password(password)
-        print(f'hashp:',hashed_password)
         new_user = User(username=username, password=hashed_password, email=email, role=Role[role.lower()])
         session.add(new_user)
         session.commit()
@@ -26,19 +24,15 @@ def registered(username, password, email, role):
     finally:
         session.close()
             
-# app/services/auth.py
 
-
-def signin(username, password):
+def signin(username, password, email):
     session = SessionLocal()
     try:
         user = session.query(User).filter(User.username == username).first()
         if user and validate_password(password, user.password):
-            # Generate a JWT token with user information
-            token = generate_jwt_token(user.id, user.username, str(user.role))
-            # print("ssssss",user.role, type(user.role))
+            token = generate_jwt_token(str(user.id), user.username, str(user.role))
             user_data = {
-                'user_id': user.id,
+                'id': str(user.id),
                 'username': user.username,
                 'email': user.email,
                 'role': str(user.role) 
@@ -80,10 +74,10 @@ def change(username, current_password, new_password):
         session.close()
 
 
-def send_forgot_pass_email(username):
+def send_forgot_pass_email(email):
     session = SessionLocal()
     try:
-        user = session.query(User).filter(User.username == username).first()
+        user = session.query(User).filter(User.email == email).first()
         if user:
             reset_token = generate_reset_token()
             user.reset_token = reset_token
@@ -98,13 +92,11 @@ def send_forgot_pass_email(username):
     finally:
         session.close()
    
-
-# app/services/auth.py
-def get_user_role(user_id):
+def get_user_role(id):
     session = SessionLocal()
 
     try:
-        user = session.query(User).filter(User.id == user_id).first()
+        user = session.query(User).filter(User.id == id).first()
         if user:
             print(user)
             return user.role
@@ -112,5 +104,3 @@ def get_user_role(user_id):
             return None
     finally:
         session.close()
-
-

@@ -1,10 +1,10 @@
 from app.models import Task
 from app.config.db_config import SessionLocal
 
-def add(data):
+def add(title, description, assigned_by_id, assigned_to_id):
     session = SessionLocal()
     try:
-        new_task = Task(title=data['title'], description=data['description'],user_id=data['user_id'])
+        new_task = Task(title=title, description=description, assigned_by_id=assigned_by_id, assigned_to_id=assigned_to_id)
         session.add(new_task)
         session.commit()
         return {'message': 'Task added successfully'}, 201
@@ -30,6 +30,7 @@ def view(task_id):
         return {'error': f'Error retrieving task: {e}'}
     finally:
         session.close()
+    
 
 def viewall():
     session = SessionLocal()
@@ -49,10 +50,10 @@ def viewall():
     finally:
         session.close()
 
-def delete(task_id):
+def delete(id):
     session = SessionLocal()
     try:
-        task = session.query(Task).filter(Task.id == task_id).first()
+        task = session.query(Task).filter(Task.id == id).first()
 
         if task:
             session.delete(task)
@@ -67,10 +68,10 @@ def delete(task_id):
         session.close()
 
 
-def update(task_id, data):
+def update(id, data):
     session = SessionLocal()
     try:
-        task = session.query(Task).filter(Task.id == task_id).first()
+        task = session.query(Task).filter(Task.id == id).first()
 
         if task:
                 # Update task fields based on the provided data
