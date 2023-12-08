@@ -1,12 +1,10 @@
 from flask import Blueprint, request, jsonify
 from app.services import *
-# from app.decorators import *
 from app.decorators.permissions import *
 from app.models import *
 from app.config.db_config import *
 
 task_bp = Blueprint('add_task', __name__)
-
 
 
 @task_bp.route('/', methods=['POST'])
@@ -20,29 +18,6 @@ def add_task(current_user_id,result):
     result=add(title=data.get('title'), description=data.get('description'), assigned_by_id=current_user_id, assigned_to_id=data.get('assigned_to_id'))
     return jsonify(result),201
 
-# def view_task_by_role(current_user_id, current_user_role, task_id):
-#     session = SessionLocal()
-#     try:
-#         if current_user_role == 'admin':
-#             task = session.query(Task).filter(Task.id == task_id).first()
-#         elif current_user_role == 'manager':
-#             task = session.query(Task).filter(Task.id == task_id, Task.assigned_by_id == current_user_id).first()
-#         elif current_user_role == 'employee':
-#             task = session.query(Task).filter(Task.id == task_id, Task.assigned_to_id == current_user_id).first()
-#         else:
-#             return {'error': 'Invalid role'}, 401
-#         if task:
-#             return {
-#                 'id': task.id,
-#                 'title': task.title,
-#                 'description': task.description
-#             }
-#         else:
-#             return {'error': 'Task not found'}, 404
-#     except Exception as e:
-#         return {'error': f'Error retrieving task: {e}'}, 500
-#     finally:
-#         session.close()
 def view_task_by_role(current_user_id, current_user_role, task_id):
     session = SessionLocal()
     try:
@@ -72,61 +47,6 @@ def view_task_by_role(current_user_id, current_user_role, task_id):
 def view_task(current_user_id, current_user_role, task_id):
     return view_task_by_role(current_user_id, current_user_role, task_id)
 
-    # if 'error' in task:
-    #     return jsonify(task), task[1]
-    # return jsonify(task)
-
-
-# def view_manager_task(assigned_by_id, task_id):
-#     session = SessionLocal()
-#     try:
-#         task = session.query(Task).filter(Task.id == task_id, Task.assigned_by_id == assigned_by_id).first()
-#         if task:
-#             return {
-#                 'id': task.id,
-#                 'title': task.title,
-#                 'description': task.description
-#             }
-#         else:
-#             return {'error': 'Task not found'}, 404
-#     except Exception as e:
-#         return {'error': f'Error retrieving task: {e}'}
-#     finally:
-#         session.close()
-
-# def view_user_task(assigned_to_id, task_id):
-#     session = SessionLocal()
-#     try:
-#         task = session.query(Task).filter(Task.id == task_id, Task.assigned_to_id == assigned_to_id).first()
-#         if task:
-#             return {
-#                 'id': task.id,
-#                 'title': task.title,
-#                 'description': task.description
-#             }
-#         else:
-#             return {'error': 'Task not found'}, 404
-#     except Exception as e:
-#         return {'error': f'Error retrieving task: {e}'}
-#     finally:
-#         session.close()
-
-# @task_bp.route('/<task_id>', methods=['GET'])
-# @token_required
-# def view_task(current_user_id, current_user_role, task_id):
-#     if current_user_role == 'admin':
-#         task = view(task_id)
-#     elif current_user_role == 'manager':
-#         task = view_manager_task(current_user_id, task_id)
-#     elif current_user_role == 'employee':
-#         task = view_user_task(current_user_id, task_id)
-#     else:
-#         return jsonify({'error': 'Invalid role'}), 401
-
-#     if not task:
-#         return jsonify({'error': 'Task not found'}), 404
-#     return jsonify(task)
-    
     
 @task_bp.route('/', methods=['GET'])
 @token_required
@@ -148,13 +68,20 @@ def delete_task(current_user_id, current_user_role, task_id):
 
 @task_bp.route('/<int:task_id>', methods=['PUT'])
 @token_required
-def update_task(current_user_role,current_user_id,task_id):
+def update_task(current_user_id, current_user_role,task_id):
     if not task_id:
         return jsonify({'error': 'Task not found'})
     data = request.get_json()
     if not data:
         return jsonify({'error': 'No data provided for update'}), 400
-    if current_user_role == 'employee':
-        return jsonify({'error':'U r ! @uthorized to update task'}), 403
-    result = update(task_id, data)
+    result = update(task_id, data, current_user_id,current_user_role)
     return jsonify(result),201
+
+
+
+
+
+
+     
+
+   

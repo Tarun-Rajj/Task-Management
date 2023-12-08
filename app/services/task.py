@@ -1,5 +1,6 @@
 from app.models import Task
 from app.config.db_config import SessionLocal
+from app.decorators.permissions import *
 
 def add(title, description, assigned_by_id, assigned_to_id):
     session = SessionLocal()
@@ -68,17 +69,26 @@ def delete(id):
         session.close()
 
 
-def update(id, data):
+def is_admin(current_user_role):
+    return current_user_role == 'admin'
+
+def is_task_creator(task, current_user_id):
+    return task.assigned_by_id == int(current_user_id)
+
+def update(id, data, current_user_id, current_user_role):
     session = SessionLocal()
     try:
         task = session.query(Task).filter(Task.id == id).first()
 
         if task:
-                # Update task fields based on the provided data
+            if is_admin(current_user_role) or is_task_creator(task, current_user_id):
                 task.title = data.get('title', task.title)
                 task.description = data.get('description', task.description)
+                task.status = data.get('status', task.status)
                 session.commit()
                 return {'message': 'Task updated successfully'}, 200
+            else:
+                return {'error': 'You are not authorized to update this task'}, 403
         else:
             return {'error': 'Task not found'}, 404
     except Exception as e:
@@ -86,4 +96,7 @@ def update(id, data):
         return {'error': f'Error updating task: {e}'}
     finally:
         session.close()
-    
+
+
+
+
