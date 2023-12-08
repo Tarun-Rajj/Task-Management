@@ -51,15 +51,26 @@ def viewall():
     finally:
         session.close()
 
-def delete(id):
+def is_admin(current_user_role):
+    return current_user_role == 'admin'
+
+def is_task_creator(task, current_user_id):
+    return task.assigned_by_id == int(current_user_id)
+
+
+def delete(id, current_user_id, current_user_role):
     session = SessionLocal()
     try:
         task = session.query(Task).filter(Task.id == id).first()
 
         if task:
-            session.delete(task)
-            session.commit()
-            return {'message': 'Task deleted successfully'}, 200
+            print("ssssa",current_user_role)
+            if is_admin(current_user_role) or is_task_creator(task, current_user_id):
+                session.delete(task)
+                session.commit()
+                return {'message': 'Task deleted successfully'}, 200
+            else:
+                return {'error' : 'you are not authorized to delete the task'}, 403
         else:
             return {'error': 'Task not found'}, 404
     except Exception as e:
@@ -68,12 +79,6 @@ def delete(id):
     finally:
         session.close()
 
-
-def is_admin(current_user_role):
-    return current_user_role == 'admin'
-
-def is_task_creator(task, current_user_id):
-    return task.assigned_by_id == int(current_user_id)
 
 def update(id, data, current_user_id, current_user_role):
     session = SessionLocal()

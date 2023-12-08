@@ -47,7 +47,7 @@ def view_task_by_role(current_user_id, current_user_role, task_id):
 def view_task(current_user_id, current_user_role, task_id):
     return view_task_by_role(current_user_id, current_user_role, task_id)
 
-    
+   
 @task_bp.route('/', methods=['GET'])
 @token_required
 @requires_role('admin')
@@ -62,15 +62,13 @@ def view_all_tasks(tasks,a):
 def delete_task(current_user_id, current_user_role, task_id):
     if current_user_role == 'employee':
         return jsonify({'error': 'You are not authorized to delete the task'}), 403
-    result = delete(task_id)
+    result = delete(task_id, current_user_id, current_user_role)
     return jsonify(result), 201
 
 
 @task_bp.route('/<int:task_id>', methods=['PUT'])
 @token_required
 def update_task(current_user_id, current_user_role,task_id):
-    if not task_id:
-        return jsonify({'error': 'Task not found'})
     data = request.get_json()
     if not data:
         return jsonify({'error': 'No data provided for update'}), 400
