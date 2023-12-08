@@ -29,3 +29,4 @@ def validate_user_forgot_password(data):
     if 'email' not in data:
         return {'error':'Email is required'}, 400
     return None
+
